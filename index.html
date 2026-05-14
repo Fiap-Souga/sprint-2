@@ -14,6 +14,7 @@
             --text-white: #fff;
             --glass-bg: rgba(255,255,255,0.08);
             --glass-border: rgba(255,255,255,0.12);
+            --delete-red: #ff4444;
         }
 
         * {
@@ -142,7 +143,6 @@
             background: #000;
         }
 
-        /* ✅ CORRIGIDO: APENAS FRONTAL MIRROR */
         video.mirror {
             transform: scaleX(-1);
         }
@@ -271,7 +271,7 @@
             background: rgba(255,255,255,0.15);
         }
 
-        /* ✅ GALERIA MELHORADA E FLUIDA */
+        /* GALERIA MELHORADA COM AÇÕES */
         .gallery-modal {
             position: absolute;
             inset: 0;
@@ -293,6 +293,12 @@
             align-items: center;
             color: white;
             flex-shrink: 0;
+            gap: 12px;
+        }
+
+        .gallery-controls {
+            display: flex;
+            gap: 8px;
         }
 
         .gallery-search {
@@ -301,8 +307,18 @@
             border-radius: 20px;
             padding: 12px 16px;
             color: white;
-            width: 200px;
+            width: 180px;
             font-size: 14px;
+        }
+
+        .category-filter {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 8px 12px;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
         }
 
         .gallery-grid {
@@ -366,7 +382,65 @@
             border-radius: 4px;
         }
 
-        /* ✅ PREVIEW FLUIDO */
+        .photo-folder {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            background: rgba(0,100,200,0.9);
+            color: white;
+            font-size: 10px;
+            padding: 2px 5px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        /* ✅ BOTÕES DE AÇÃO NA FOTO */
+        .photo-actions {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            display: none;
+            gap: 4px;
+        }
+
+        .gallery-photo:hover .photo-actions,
+        .gallery-photo.selected .photo-actions {
+            display: flex;
+        }
+
+        .action-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: none;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .delete-btn {
+            background: var(--delete-red);
+            color: white;
+        }
+
+        .delete-btn:hover {
+            background: #ff6666;
+            transform: scale(1.1);
+        }
+
+        .edit-btn {
+            background: var(--primary-gold);
+            color: #000;
+        }
+
+        .edit-btn:hover {
+            background: #ffd54f;
+            transform: scale(1.1);
+        }
+
         .photo-preview {
             position: absolute;
             top: 0;
@@ -387,6 +461,7 @@
             box-shadow: 0 20px 60px rgba(0,0,0,0.8);
         }
 
+        /* ✅ SELETOR DE PASTAS MELHORADO */
         .folder-selector {
             position: absolute;
             bottom: 100px;
@@ -394,29 +469,48 @@
             transform: translateX(-50%);
             background: var(--glass-bg);
             backdrop-filter: blur(20px);
-            padding: 16px;
+            padding: 20px;
             border-radius: 20px;
             border: 1px solid var(--glass-border);
             display: none;
-            flex-wrap: wrap;
-            gap: 8px;
+            flex-direction: column;
+            gap: 12px;
             max-width: 90%;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .folder-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 8px;
         }
 
         .folder-btn {
-            padding: 8px 16px;
+            padding: 12px 8px;
             background: rgba(255,255,255,0.1);
             border: 1px solid rgba(255,255,255,0.2);
             border-radius: 16px;
             color: white;
-            font-size: 14px;
+            font-size: 13px;
             cursor: pointer;
             transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
         }
 
         .folder-btn:hover {
             background: var(--primary-gold);
             color: #000;
+            transform: translateY(-2px);
+        }
+
+        .folder-btn.active {
+            background: var(--accent-green);
+            color: #000;
+            border-color: var(--accent-green);
         }
 
         .grid-overlay {
@@ -486,31 +580,42 @@
             <div class="focus-ring" id="focus"></div>
         </div>
 
-        <!-- ✅ PREVIEW FLUIDO -->
+        <!-- PREVIEW FLUIDO -->
         <div class="photo-preview" id="photoPreview">
             <img class="preview-image" id="previewImg" src="" alt="">
         </div>
 
-        <!-- ✅ GALERIA MELHORADA -->
+        <!-- GALERIA MELHORADA COM AÇÕES -->
         <div class="gallery-modal" id="galleryModal">
             <div class="gallery-header">
                 <input type="text" class="gallery-search" id="gallerySearch" placeholder="Pesquisar fotos...">
-                <h3 id="galleryTitle">Minhas Fotos</h3>
-                <i class="fa-solid fa-xmark" id="closeGallery" style="font-size: 24px; cursor: pointer;"></i>
+                <div class="gallery-controls">
+                    <select class="category-filter" id="categoryFilter">
+                        <option value="all">Todas</option>
+                        <option value="📸 Geral">📸 Geral</option>
+                        <option value="👤 Pessoas">👤 Pessoas</option>
+                        <option value="🍔 Comida">🍔 Comida</option>
+                        <option value="🚗 Carros">🚗 Carros</option>
+                        <option value="🌄 Paisagem">🌄 Paisagem</option>
+                    </select>
+                    <i class="fa-solid fa-xmark" id="closeGallery" style="font-size: 24px; cursor: pointer;"></i>
+                </div>
             </div>
             <div class="gallery-grid" id="galleryGrid">
                 <!-- Fotos aparecerão aqui -->
             </div>
         </div>
 
-        <!-- ✅ ORGANIZAÇÃO MANUAL -->
+        <!-- SELETOR DE PASTAS MELHORADO -->
         <div class="folder-selector" id="folderSelector">
-            <div>Salvar em:</div>
-            <button class="folder-btn" data-folder="📸 Geral">📸 Geral</button>
-            <button class="folder-btn" data-folder="👤 Pessoas">👤 Pessoas</button>
-            <button class="folder-btn" data-folder="🍔 Comida">🍔 Comida</button>
-            <button class="folder-btn" data-folder="🚗 Carros">🚗 Carros</button>
-            <button class="folder-btn" data-folder="🌄 Paisagem">🌄 Paisagem</button>
+            <div style="color: white; font-weight: 600; margin-bottom: 8px;">Mover para:</div>
+            <div class="folder-grid">
+                <button class="folder-btn active" data-folder="📸 Geral"><span>📸</span>Geral</button>
+                <button class="folder-btn" data-folder="👤 Pessoas"><span>👤</span>Pessoas</button>
+                <button class="folder-btn" data-folder="🍔 Comida"><span>🍔</span>Comida</button>
+                <button class="folder-btn" data-folder="🚗 Carros"><span>🚗</span>Carros</button>
+                <button class="folder-btn" data-folder="🌄 Paisagem"><span>🌄</span>Paisagem</button>
+            </div>
         </div>
 
         <!-- Bottom controls -->
@@ -553,13 +658,16 @@
                 this.previewImg = document.getElementById("previewImg");
                 this.gallerySearch = document.getElementById("gallerySearch");
                 this.galleryTitle = document.getElementById("galleryTitle");
+                this.categoryFilter = document.getElementById("categoryFilter");
 
                 this.currentCamera = "environment";
                 this.currentStream = null;
                 this.photos = JSON.parse(localStorage.getItem('cameraPhotos')) || [];
                 this.selectedPhoto = null;
+                this.selectedPhotos = new Set();
                 this.zoomLevel = 1;
                 this.filteredPhotos = [];
+                this.currentFilter = 'all';
 
                 this.init();
             }
@@ -588,10 +696,7 @@
 
                     this.currentStream = stream;
                     this.video.srcObject = stream;
-                    
-                    // ✅ PERFEITO: SOMENTE FRONTAL INVERTIDA
                     this.video.classList.toggle('mirror', this.currentCamera === 'user');
-                    
                     await this.video.play();
                     this.applyZoom();
                 } catch (e) {
@@ -606,7 +711,7 @@
                     this.startCamera();
                 };
 
-                // ✅ GALERIA MELHORADA
+                // Gallery
                 this.galleryBtn.onclick = (e) => {
                     e.stopPropagation();
                     this.galleryModal.classList.add('show');
@@ -616,6 +721,7 @@
                 document.getElementById("closeGallery").onclick = () => {
                     this.galleryModal.classList.remove('show');
                     document.body.style.overflow = '';
+                    this.selectedPhotos.clear();
                 };
 
                 // Preview
@@ -650,20 +756,23 @@
                     this.filterPhotos(e.target.value);
                 };
 
-                // ✅ ORGANIZAÇÃO MANUAL
+                // Category filter
+                this.categoryFilter.onchange = (e) => {
+                    this.currentFilter = e.target.value;
+                    this.filterPhotos(this.gallerySearch.value);
+                };
+
+                // Folder buttons
                 document.querySelectorAll('.folder-btn').forEach(btn => {
                     btn.onclick = () => {
                         if (this.selectedPhoto) {
-                            this.savePhoto(this.selectedPhoto, btn.dataset.folder);
-                            this.selectedPhoto = null;
-                            this.folderSelector.style.display = 'none';
+                            this.movePhotoToFolder(this.selectedPhoto, btn.dataset.folder);
                         }
                     };
                 });
             }
 
             applyZoom() {
-                // ✅ TRASERIRA SEM INVERÇÃO, FRONTAL COM MIRROR
                 const mirrorScale = this.currentCamera === 'user' ? -1 : 1;
                 this.video.style.transform = `scaleX(${mirrorScale}) scale(${this.zoomLevel})`;
             }
@@ -681,7 +790,6 @@
                 this.canvas.height = this.video.videoHeight;
                 const ctx = this.canvas.getContext("2d");
                 
-                // ✅ CAPTURA CORRETA: TRASERIRA NORMAL, FRONTAL MIRROR
                 if (this.currentCamera === 'user') {
                     ctx.scale(-1, 1);
                     ctx.drawImage(this.video, -this.canvas.width, 0);
@@ -703,61 +811,112 @@
                 this.loadPhotos();
             }
 
-            filterPhotos(query) {
-                this.filteredPhotos = this.photos.filter(photo => 
-                    photo.date.toLowerCase().includes(query.toLowerCase())
-                );
+            // ✅ NOVA: FILTRAGEM POR CATEGORIA E TEXTO
+            filterPhotos(query = '') {
+                this.filteredPhotos = this.photos.filter(photo => {
+                    const matchesSearch = !query || 
+                        photo.date.toLowerCase().includes(query.toLowerCase()) ||
+                        photo.folder.toLowerCase().includes(query.toLowerCase());
+                    
+                    const matchesCategory = this.currentFilter === 'all' || photo.folder === this.currentFilter;
+                    
+                    return matchesSearch && matchesCategory;
+                });
                 this.renderGallery();
             }
 
             loadPhotos() {
-                this.filteredPhotos = [...this.photos];
-                this.renderGallery();
+                this.filterPhotos();
             }
 
+            // ✅ NOVA: RENDERIZAR COM BOTÕES DE AÇÃO
             renderGallery() {
                 this.galleryGrid.innerHTML = '';
-                this.filteredPhotos.slice(0, 30).forEach((photo, index) => {
+                this.filteredPhotos.slice(0, 30).forEach((photo) => {
                     const div = document.createElement('div');
                     div.className = 'gallery-photo';
                     div.innerHTML = `
                         <img src="${photo.data}" alt="${photo.date}">
                         <div class="photo-date">${photo.date.split(',')[0]}</div>
+                        <div class="photo-folder">${photo.folder}</div>
+                        <div class="photo-actions">
+                            <button class="action-btn edit-btn" title="Categorizar">
+                                <i class="fa-solid fa-folder"></i>
+                            </button>
+                            <button class="action-btn delete-btn" title="Excluir">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
                     `;
-                    div.onclick = (e) => this.handlePhotoClick(e, photo, div);
+                    
+                    // Seleção múltipla
+                    div.onclick = (e) => {
+                        e.stopPropagation();
+                        if (e.target.closest('.action-btn')) return;
+                        
+                        if (this.selectedPhotos.has(photo.id)) {
+                            this.selectedPhotos.delete(photo.id);
+                            div.classList.remove('selected');
+                        } else {
+                            this.selectedPhotos.add(photo.id);
+                            div.classList.add('selected');
+                        }
+                        
+                        this.selectedPhoto = this.selectedPhotos.size === 1 ? photo : null;
+                        this.folderSelector.style.display = this.selectedPhoto ? 'flex' : 'none';
+                    };
+
+                    // Botão editar/categorizar
+                    div.querySelector('.edit-btn').onclick = (e) => {
+                        e.stopPropagation();
+                        this.selectedPhoto = photo;
+                        document.querySelectorAll('.gallery-photo').forEach(el => el.classList.remove('selected'));
+                        div.classList.add('selected');
+                        this.folderSelector.style.display = 'flex';
+                    };
+
+                    // Botão excluir
+                    div.querySelector('.delete-btn').onclick = (e) => {
+                        e.stopPropagation();
+                        if (confirm(`Excluir foto de ${photo.folder}?`)) {
+                            this.deletePhoto(photo.id);
+                        }
+                    };
+
                     this.galleryGrid.appendChild(div);
                 });
             }
 
-            handlePhotoClick(e, photo, element) {
-                e.stopPropagation();
-                
-                // Preview
-                this.previewImg.src = photo.data;
-                this.photoPreview.style.display = 'flex';
-                
-                // Remove previous selection
-                document.querySelectorAll('.gallery-photo').forEach(el => 
-                    el.classList.remove('selected')
-                );
-                
-                // Select current
-                element.classList.add('selected');
-                this.selectedPhoto = photo;
-                this.folderSelector.style.display = 'flex';
-            }
-
-            savePhoto(photo, folder) {
+            // ✅ NOVA: MOVER PARA PASTA
+            movePhotoToFolder(photo, folder) {
                 photo.folder = folder;
+                // Atualizar botão ativo
+                document.querySelectorAll('.folder-btn').forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.folder === folder);
+                });
+                
                 localStorage.setItem('cameraPhotos', JSON.stringify(this.photos));
-                this.loadPhotos();
+                this.filterPhotos(this.gallerySearch.value);
                 this.folderSelector.style.display = 'none';
                 
-                // Download
+                // Download opcional
                 const link = document.createElement("a");
                 link.href = photo.data;
                 link.download = `${folder.replace(/[^a-z0-9]/gi, '_')}_${photo.id}.jpg`;
                 link.click();
+            }
+
+            // ✅ NOVA: EXCLUIR FOTO
+            deletePhoto(photoId) {
+                this.photos = this.photos.filter(photo => photo.id !== photoId);
+                this.selectedPhotos.delete(photoId);
+                localStorage.setItem('cameraPhotos', JSON.stringify(this.photos));
+                this.filterPhotos(this.gallerySearch.value);
+                
+                if (this.selectedPhoto && this.selectedPhoto.id === photoId) {
+                    this.selectedPhoto = null;
+                    this.folderSelector.style.display = 'none';
+                }
             }
 
             handleFocus(e) {
