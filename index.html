@@ -4,9 +4,8 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-<title>Câmera iPhone Clone</title>
+<title>iPhone Camera Pro</title>
 
-<!-- ICONS -->
 <link rel="stylesheet"
 href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
 />
@@ -17,34 +16,35 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
     margin:0;
     padding:0;
     box-sizing:border-box;
-    font-family:Arial, Helvetica, sans-serif;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
 }
 
 body{
     width:100%;
     height:100vh;
+    background:#000;
     display:flex;
     justify-content:center;
     align-items:center;
-    background:black;
     overflow:hidden;
 }
 
-/* CELULAR */
+/* PHONE */
 
 .phone{
     width:390px;
     height:820px;
-    background:black;
+    background:#000;
     border-radius:55px;
     overflow:hidden;
     position:relative;
 
-    border:8px solid #1f1f1f;
+    border:8px solid #161616;
 
     box-shadow:
-    0 0 0 3px #555,
-    0 0 40px rgba(255,255,255,0.08);
+    0 0 0 2px #444,
+    0 0 40px rgba(255,255,255,0.08),
+    inset 0 0 10px rgba(255,255,255,0.05);
 }
 
 /* NOTCH */
@@ -78,7 +78,7 @@ body{
     z-index:999;
 
     font-size:18px;
-    font-weight:bold;
+    font-weight:600;
 }
 
 .status-icons{
@@ -86,7 +86,7 @@ body{
     gap:10px;
 }
 
-/* MENU SUPERIOR */
+/* TOP MENU */
 
 .top-menu{
     width:100%;
@@ -98,19 +98,32 @@ body{
     justify-content:space-around;
     align-items:center;
 
+    padding:16px 0;
+
     color:white;
+
     z-index:999;
 
-    background:rgba(0,0,0,0.35);
+    background:rgba(0,0,0,0.22);
 
-    backdrop-filter:blur(10px);
+    backdrop-filter:blur(15px);
 
-    padding:15px 0;
+    border-top:1px solid rgba(255,255,255,0.08);
+    border-bottom:1px solid rgba(255,255,255,0.08);
 
-    font-size:28px;
+    font-size:26px;
 }
 
-/* CAMERA */
+.top-menu i{
+    cursor:pointer;
+    transition:.2s;
+}
+
+.top-menu i:hover{
+    transform:scale(1.1);
+}
+
+/* CAMERA AREA */
 
 .camera-area{
     width:100%;
@@ -126,6 +139,9 @@ video{
     height:100%;
     object-fit:cover;
     background:black;
+
+    /* REMOVE ESPELHO */
+    transform:scaleX(1);
 }
 
 /* FLASH */
@@ -136,8 +152,40 @@ video{
     background:white;
     opacity:0;
     pointer-events:none;
-    transition:0.15s;
+    transition:.15s;
 }
+
+/* GRID */
+
+.grid{
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    display:none;
+}
+
+.grid span{
+    position:absolute;
+    background:rgba(255,255,255,0.18);
+}
+
+.grid span:nth-child(1),
+.grid span:nth-child(2){
+    width:1px;
+    height:100%;
+}
+
+.grid span:nth-child(3),
+.grid span:nth-child(4){
+    height:1px;
+    width:100%;
+}
+
+.grid span:nth-child(1){ left:33.3%; }
+.grid span:nth-child(2){ left:66.6%; }
+
+.grid span:nth-child(3){ top:33.3%; }
+.grid span:nth-child(4){ top:66.6%; }
 
 /* FOCUS */
 
@@ -147,7 +195,7 @@ video{
 
     border:3px solid #ffd000;
 
-    border-radius:10px;
+    border-radius:12px;
 
     position:absolute;
 
@@ -155,7 +203,7 @@ video{
 
     pointer-events:none;
 
-    animation:focusAnim .8s ease;
+    animation:focusAnim .7s ease;
 }
 
 @keyframes focusAnim{
@@ -176,6 +224,49 @@ video{
 
 }
 
+/* ZOOM */
+
+.zoom{
+    position:absolute;
+    bottom:180px;
+    left:50%;
+    transform:translateX(-50%);
+
+    display:flex;
+    gap:12px;
+
+    z-index:999;
+}
+
+.zoom button{
+    width:55px;
+    height:55px;
+
+    border-radius:50%;
+
+    border:none;
+
+    background:rgba(0,0,0,0.45);
+
+    backdrop-filter:blur(10px);
+
+    color:white;
+
+    font-weight:bold;
+    font-size:18px;
+
+    cursor:pointer;
+
+    border:1px solid rgba(255,255,255,0.15);
+
+    transition:.2s;
+}
+
+.zoom button.active{
+    background:white;
+    color:black;
+}
+
 /* BOTTOM */
 
 .bottom{
@@ -188,8 +279,8 @@ video{
 
     background:linear-gradient(
     to top,
-    rgba(0,0,0,0.96),
-    rgba(0,0,0,0.4),
+    rgba(0,0,0,0.97),
+    rgba(0,0,0,0.5),
     transparent
     );
 
@@ -203,7 +294,7 @@ video{
 
     display:flex;
     justify-content:center;
-    gap:25px;
+    gap:28px;
 
     margin-bottom:20px;
 }
@@ -216,9 +307,9 @@ video{
     color:white;
 
     font-size:20px;
-    font-weight:bold;
+    font-weight:700;
 
-    opacity:0.6;
+    opacity:.5;
 
     cursor:pointer;
 }
@@ -240,12 +331,14 @@ video{
 /* GALLERY */
 
 .gallery{
-    width:60px;
-    height:60px;
+    width:65px;
+    height:65px;
 
-    border-radius:15px;
+    border-radius:18px;
 
     overflow:hidden;
+
+    border:2px solid rgba(255,255,255,0.25);
 }
 
 .gallery img{
@@ -264,31 +357,55 @@ video{
 
     border:6px solid white;
 
-    background:#e9e9e9;
+    background:#ececec;
 
     cursor:pointer;
 
-    transition:0.2s;
+    transition:.15s;
+
+    box-shadow:
+    0 0 20px rgba(255,255,255,0.2),
+    inset 0 0 10px rgba(255,255,255,0.6);
 }
 
 .capture:active{
-    transform:scale(0.9);
+    transform:scale(.88);
 }
 
-/* MORE */
+/* SIDE BUTTONS */
 
-.more{
+.side-buttons{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+.side-buttons button{
+
     width:60px;
     height:60px;
 
     border:none;
-    background:none;
+
+    border-radius:50%;
+
+    background:rgba(0,0,0,0.45);
 
     color:white;
 
-    font-size:32px;
+    font-size:22px;
 
     cursor:pointer;
+
+    backdrop-filter:blur(10px);
+
+    border:1px solid rgba(255,255,255,0.12);
+
+    transition:.2s;
+}
+
+.side-buttons button:hover{
+    transform:scale(1.05);
 }
 
 /* RESPONSIVO */
@@ -330,10 +447,10 @@ video{
     <!-- MENU -->
     <div class="top-menu">
 
-        <i class="fa-solid fa-glasses"></i>
-        <i class="fa-solid fa-robot"></i>
-        <i class="fa-regular fa-book-open"></i>
-        <i class="fa-regular fa-folder"></i>
+        <i class="fa-solid fa-bolt"></i>
+        <i class="fa-solid fa-wand-magic-sparkles"></i>
+        <i class="fa-solid fa-layer-group"></i>
+        <i class="fa-solid fa-moon"></i>
         <i class="fa-solid fa-gear"></i>
 
     </div>
@@ -343,9 +460,28 @@ video{
 
         <video id="video" autoplay playsinline></video>
 
+        <!-- FLASH -->
         <div class="flash" id="flash"></div>
 
+        <!-- GRID -->
+        <div class="grid" id="grid">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+
+        <!-- FOCUS -->
         <div class="focus" id="focus"></div>
+
+    </div>
+
+    <!-- ZOOM -->
+    <div class="zoom">
+
+        <button>0.5</button>
+        <button class="active">1x</button>
+        <button>2x</button>
 
     </div>
 
@@ -356,9 +492,7 @@ video{
         <div class="modes">
 
             <button>Retrato</button>
-
             <button class="active">Foto</button>
-
             <button>Vídeo</button>
 
         </div>
@@ -366,23 +500,35 @@ video{
         <!-- CONTROLS -->
         <div class="controls">
 
+            <!-- GALLERY -->
             <div class="gallery">
 
-                <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=400" alt="">
+                <img id="galleryImg"
+                src="https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=400"
+                alt="">
 
             </div>
 
+            <!-- CAPTURE -->
             <button class="capture" id="capture"></button>
 
-            <button class="more">
-                <i class="fa-solid fa-ellipsis"></i>
-            </button>
+            <!-- SIDE -->
+            <div class="side-buttons">
+
+                <button id="switchCamera">
+                    <i class="fa-solid fa-rotate"></i>
+                </button>
+
+                <button id="toggleGrid">
+                    <i class="fa-solid fa-border-all"></i>
+                </button>
+
+            </div>
 
         </div>
 
     </div>
 
-    <!-- CANVAS -->
     <canvas id="canvas" style="display:none;"></canvas>
 
 </div>
@@ -397,6 +543,13 @@ const canvas = document.getElementById("canvas");
 const flash = document.getElementById("flash");
 const focus = document.getElementById("focus");
 const clock = document.getElementById("clock");
+const switchCamera = document.getElementById("switchCamera");
+const toggleGrid = document.getElementById("toggleGrid");
+const grid = document.getElementById("grid");
+const galleryImg = document.getElementById("galleryImg");
+
+let currentCamera = "environment";
+let currentStream = null;
 
 /* RELOGIO */
 
@@ -421,15 +574,25 @@ async function startCamera(){
 
     try{
 
+        if(currentStream){
+
+            currentStream.getTracks().forEach(track=>{
+                track.stop();
+            });
+
+        }
+
         const stream = await navigator.mediaDevices.getUserMedia({
 
             video:{
-                facingMode:"user"
+                facingMode:currentCamera
             },
 
             audio:false
 
         });
+
+        currentStream = stream;
 
         video.srcObject = stream;
 
@@ -444,6 +607,19 @@ async function startCamera(){
 }
 
 startCamera();
+
+/* TROCAR CAMERA */
+
+switchCamera.addEventListener("click",()=>{
+
+    currentCamera =
+    currentCamera === "user"
+    ? "environment"
+    : "user";
+
+    startCamera();
+
+});
 
 /* FOTO */
 
@@ -465,6 +641,8 @@ capture.addEventListener("click",()=>{
     "https://actions.google.com/sounds/v1/camera/camera_shutter_click_01.mp3"
     );
 
+    audio.volume = 0.4;
+
     audio.play();
 
     /* FOTO */
@@ -483,6 +661,12 @@ capture.addEventListener("click",()=>{
     );
 
     const image = canvas.toDataURL("image/png");
+
+    /* GALERIA */
+
+    galleryImg.src = image;
+
+    /* DOWNLOAD */
 
     const link = document.createElement("a");
 
@@ -513,6 +697,21 @@ video.addEventListener("click",(e)=>{
         focus.style.display = "none";
 
     },700);
+
+});
+
+/* GRID */
+
+let gridEnabled = false;
+
+toggleGrid.addEventListener("click",()=>{
+
+    gridEnabled = !gridEnabled;
+
+    grid.style.display =
+    gridEnabled
+    ? "block"
+    : "none";
 
 });
 
