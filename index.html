@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
     <title>Samsung Camera Pro</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
-    <script src="https://unpkg.com/ml5@0.4.3/dist/ml5.min.js"></script>
     
     <style>
         :root {
@@ -69,7 +68,6 @@
             padding-top: max(20px, env(safe-area-inset-top));
         }
 
-        /* Interface limpa - inspirada Samsung */
         .top-controls {
             position: absolute;
             top: 80px;
@@ -144,9 +142,9 @@
             background: #000;
         }
 
-        /* SEM INVERSÃO na câmera frontal */
-        .camera-user video {
-            transform: none !important;
+        /* ✅ CORREÇÃO DEFINITIVA: SEM INVERSÃO NA FRONTAL */
+        video.mirror {
+            transform: scaleX(-1);
         }
 
         .flash {
@@ -175,76 +173,6 @@
             100% { transform: scale(1.2); opacity: 0; }
         }
 
-        /* AI Overlay mais limpo */
-        .ai-overlay {
-            position: absolute;
-            inset: 0;
-            background: rgba(0,0,0,0.95);
-            display: none;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            color: white;
-            text-align: center;
-            backdrop-filter: blur(20px);
-            gap: 24px;
-        }
-
-        .ai-overlay.show {
-            display: flex;
-        }
-
-        .ai-spinner {
-            width: 50px;
-            height: 50px;
-            border: 3px solid rgba(255,255,255,0.2);
-            border-top: 3px solid var(--primary-gold);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .folder-suggestion {
-            background: rgba(0,200,83,0.15);
-            padding: 16px 32px;
-            border-radius: 28px;
-            border: 2px solid var(--accent-green);
-            font-size: 18px;
-            font-weight: 600;
-        }
-
-        .ai-buttons {
-            display: flex;
-            gap: 12px;
-        }
-
-        .ai-btn {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 25px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            min-width: 120px;
-        }
-
-        .confirm-btn {
-            background: var(--accent-green);
-            color: white;
-        }
-
-        .change-btn {
-            background: rgba(255,255,255,0.1);
-            color: white;
-            border: 1px solid rgba(255,255,255,0.3);
-        }
-
-        /* Bottom controls limpos - Samsung style */
         .bottom-controls {
             position: absolute;
             bottom: 0;
@@ -292,7 +220,7 @@
             height: 64px;
             border-radius: 18px;
             overflow: hidden;
-            border: 2px solid rgba(255,255,255,0.3);
+            border: 3px solid rgba(255,255,255,0.4);
             cursor: pointer;
             transition: all 0.2s ease;
             background: var(--glass-bg);
@@ -343,6 +271,91 @@
             background: rgba(255,255,255,0.15);
         }
 
+        /* ✅ GALERIA MANUAL BONITA */
+        .gallery-modal {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.98);
+            display: none;
+            flex-direction: column;
+            z-index: 1001;
+            backdrop-filter: blur(20px);
+        }
+
+        .gallery-modal.show {
+            display: flex;
+        }
+
+        .gallery-header {
+            padding: 20px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+        }
+
+        .gallery-grid {
+            flex: 1;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            overflow-y: auto;
+        }
+
+        .gallery-photo {
+            aspect-ratio: 1;
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 2px solid transparent;
+            background: var(--glass-bg);
+        }
+
+        .gallery-photo:hover {
+            transform: scale(1.05);
+            border-color: var(--primary-gold);
+        }
+
+        .gallery-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .folder-selector {
+            position: absolute;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            padding: 16px;
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            display: none;
+            flex-wrap: wrap;
+            gap: 8px;
+            max-width: 90%;
+        }
+
+        .folder-btn {
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 16px;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .folder-btn:hover {
+            background: var(--primary-gold);
+            color: #000;
+        }
+
         .grid-overlay {
             position: absolute;
             inset: 0;
@@ -363,7 +376,7 @@
         .grid-line:nth-child(3) { top: 33%; }
         .grid-line:nth-child(4) { top: 67%; }
 
-        canvas, #aiImage {
+        canvas {
             display: none;
         }
 
@@ -377,7 +390,7 @@
     <div class="phone">
         <!-- Status bar -->
         <div class="status-bar">
-            <div><span id="clock">09:32</span></div>
+            <div><span id="clock">09:37</span></div>
             <div>
                 <i class="fa-solid fa-signal-bars-good"></i>
                 <i class="fa-solid fa-wifi"></i>
@@ -385,9 +398,9 @@
             </div>
         </div>
 
-        <!-- Top controls (limpos) -->
+        <!-- Top controls -->
         <div class="top-controls">
-            <div class="camera-switch" id="switchCamera" title="Trocar câmera">
+            <div class="camera-switch" id="switchCamera">
                 <i class="fa-solid fa-rotate"></i>
             </div>
             <div class="zoom-slider">
@@ -408,16 +421,27 @@
                 <div class="grid-line"></div>
             </div>
             <div class="focus-ring" id="focus"></div>
+        </div>
 
-            <!-- AI Overlay -->
-            <div class="ai-overlay" id="aiOverlay">
-                <div class="ai-spinner"></div>
-                <div class="folder-suggestion" id="folderTag">Analisando...</div>
-                <div class="ai-buttons">
-                    <button class="ai-btn confirm-btn" id="confirmFolder">Salvar ✓</button>
-                    <button class="ai-btn change-btn" id="changeFolder">Cancelar</button>
-                </div>
+        <!-- ✅ GALERIA MANUAL BONITA -->
+        <div class="gallery-modal" id="galleryModal">
+            <div class="gallery-header">
+                <h3>Minhas Fotos</h3>
+                <i class="fa-solid fa-xmark" id="closeGallery" style="font-size: 24px; cursor: pointer;"></i>
             </div>
+            <div class="gallery-grid" id="galleryGrid">
+                <!-- Fotos aparecerão aqui -->
+            </div>
+        </div>
+
+        <!-- ✅ ORGANIZAÇÃO MANUAL -->
+        <div class="folder-selector" id="folderSelector">
+            <div>Salvar em:</div>
+            <button class="folder-btn" data-folder="📸 Geral">📸 Geral</button>
+            <button class="folder-btn" data-folder="👤 Pessoas">👤 Pessoas</button>
+            <button class="folder-btn" data-folder="🍔 Comida">🍔 Comida</button>
+            <button class="folder-btn" data-folder="🚗 Carros">🚗 Carros</button>
+            <button class="folder-btn" data-folder="🌄 Paisagem">🌄 Paisagem</button>
         </div>
 
         <!-- Bottom controls -->
@@ -428,65 +452,48 @@
                 <button class="mode-btn">Vídeo</button>
             </div>
             <div class="capture-row">
-                <div class="gallery-btn" id="gallery">
-                    <img id="galleryImg" src="https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=400" alt="">
+                <div class="gallery-btn" id="galleryBtn">
+                    <img id="galleryThumb" src="https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=400" alt="">
                 </div>
                 <button class="capture-btn" id="capture"></button>
-                <div class="grid-toggle" id="toggleGrid" title="Grade">
+                <div class="grid-toggle" id="toggleGrid">
                     <i class="fa-solid fa-border-all"></i>
                 </div>
             </div>
         </div>
 
         <canvas id="canvas"></canvas>
-        <img id="aiImage">
     </div>
 
     <script>
-        class SamsungCameraPro {
+        class SamsungCamera {
             constructor() {
                 this.video = document.getElementById("video");
                 this.capture = document.getElementById("capture");
                 this.canvas = document.getElementById("canvas");
-                this.aiImage = document.getElementById("aiImage");
                 this.flash = document.getElementById("flash");
                 this.focus = document.getElementById("focus");
                 this.clock = document.getElementById("clock");
-                this.galleryImg = document.getElementById("galleryImg");
-                this.aiOverlay = document.getElementById("aiOverlay");
-                this.folderTag = document.getElementById("folderTag");
-                this.confirmFolder = document.getElementById("confirmFolder");
-                this.changeFolder = document.getElementById("changeFolder");
+                this.galleryBtn = document.getElementById("galleryBtn");
+                this.galleryThumb = document.getElementById("galleryThumb");
+                this.galleryModal = document.getElementById("galleryModal");
+                this.galleryGrid = document.getElementById("galleryGrid");
+                this.folderSelector = document.getElementById("folderSelector");
+                this.closeGallery = document.getElementById("closeGallery");
 
-                this.currentCamera = "environment"; // Começa com câmera traseira
+                this.currentCamera = "environment";
                 this.currentStream = null;
-                this.classifier = null;
-                this.currentPhotoData = null;
+                this.photos = JSON.parse(localStorage.getItem('cameraPhotos')) || [];
+                this.selectedPhoto = null;
                 this.zoomLevel = 1;
-                this.isGridVisible = false;
-
-                this.folders = {
-                    'food': '🍔 Comida',
-                    'person': '👤 Pessoas', 
-                    'car': '🚗 Carros',
-                    'animal': '🐶 Animais',
-                    'landscape': '🌄 Paisagens',
-                    'object': '📦 Objetos',
-                    'text': '📄 Documentos'
-                };
 
                 this.init();
             }
 
-            async init() {
+            init() {
                 this.updateClock();
                 setInterval(() => this.updateClock(), 1000);
-                
-                // ML5.js
-                this.classifier = await ml5.imageClassifier('MobileNet', () => {
-                    console.log('🤖 AI carregada!');
-                });
-                
+                this.loadPhotos();
                 this.bindEvents();
                 this.startCamera();
             }
@@ -497,42 +504,42 @@
                         this.currentStream.getTracks().forEach(track => track.stop());
                     }
 
-                    const constraints = {
+                    const stream = await navigator.mediaDevices.getUserMedia({
                         video: { 
                             facingMode: this.currentCamera,
                             width: { ideal: 1920 },
                             height: { ideal: 1080 }
                         }
-                    };
+                    });
 
-                    const stream = await navigator.mediaDevices.getUserMedia(constraints);
                     this.currentStream = stream;
                     this.video.srcObject = stream;
                     
-                    // ✅ SEM INVERSÃO na câmera frontal
-                    this.video.classList.toggle('camera-user', this.currentCamera === 'user');
+                    // ✅ CORREÇÃO DEFINITIVA DA INVERSÃO
+                    this.video.classList.toggle('mirror', this.currentCamera === 'user');
                     
                     await this.video.play();
                     this.applyZoom();
                 } catch (e) {
-                    console.error('Erro câmera:', e);
                     alert('Permita acesso à câmera!');
                 }
             }
 
             bindEvents() {
-                // Switch câmera
+                // Switch camera
                 document.getElementById("switchCamera").onclick = () => {
                     this.currentCamera = this.currentCamera === "user" ? "environment" : "user";
                     this.startCamera();
                 };
 
-                // ✅ Galeria mais confiável
-                document.getElementById("gallery").onclick = (e) => {
+                // ✅ GALERIA
+                this.galleryBtn.onclick = (e) => {
                     e.stopPropagation();
-                    if (this.currentPhotoData) {
-                        window.open(this.currentPhotoData, '_blank');
-                    }
+                    this.galleryModal.classList.add('show');
+                };
+
+                document.getElementById("closeGallery").onclick = () => {
+                    this.galleryModal.classList.remove('show');
                 };
 
                 // Capture
@@ -541,10 +548,10 @@
                 // Focus
                 this.video.onclick = (e) => this.handleFocus(e);
 
-                // Grid toggle
+                // Grid
                 document.getElementById("toggleGrid").onclick = () => {
-                    this.isGridVisible = !this.isGridVisible;
-                    document.getElementById("grid").style.display = this.isGridVisible ? 'block' : 'none';
+                    const grid = document.getElementById("grid");
+                    grid.style.display = grid.style.display === 'block' ? 'none' : 'block';
                 };
 
                 // Zoom
@@ -557,14 +564,20 @@
                     };
                 });
 
-                // AI buttons
-                this.confirmFolder.onclick = () => this.saveToFolder();
-                this.changeFolder.onclick = () => this.aiOverlay.classList.remove('show');
+                // ✅ ORGANIZAÇÃO MANUAL
+                document.querySelectorAll('.folder-btn').forEach(btn => {
+                    btn.onclick = () => {
+                        if (this.selectedPhoto) {
+                            this.savePhoto(this.selectedPhoto, btn.dataset.folder);
+                            this.selectedPhoto = null;
+                            this.folderSelector.style.display = 'none';
+                        }
+                    };
+                });
             }
 
             applyZoom() {
-                const transform = `scale(${this.zoomLevel})`;
-                this.video.style.transform = transform;
+                this.video.style.transform = `scaleX(${-1 * (this.currentCamera === 'user' ? 1 : 1)}) scale(${this.zoomLevel})`;
             }
 
             updateClock() {
@@ -572,75 +585,62 @@
                 this.clock.textContent = now.toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'});
             }
 
-            async capturePhoto() {
+            capturePhoto() {
                 this.flash.style.opacity = "0.9";
                 setTimeout(() => this.flash.style.opacity = "0", 200);
 
-                // Captura SEM inversão na frontal
                 this.canvas.width = this.video.videoWidth;
                 this.canvas.height = this.video.videoHeight;
                 const ctx = this.canvas.getContext("2d");
-                ctx.drawImage(this.video, 0, 0); // SEM scale(-1,1)
                 
-                this.currentPhotoData = this.canvas.toDataURL("image/jpeg", 0.92);
-                this.galleryImg.src = this.currentPhotoData;
-                this.analyzeWithAI();
-            }
-
-            analyzeWithAI() {
-                this.aiOverlay.classList.add('show');
-                this.folderTag.textContent = '🤖 Analisando...';
-
-                this.aiImage.src = this.currentPhotoData;
-                this.aiImage.onload = () => {
-                    this.classifier.classify(this.aiImage, (error, results) => {
-                        if (error) {
-                            this.folderTag.textContent = 'Erro na análise';
-                            return;
-                        }
-                        
-                        const topResult = results[0];
-                        const folder = this.getSmartFolder(topResult.label);
-                        const confidence = (topResult.confidence * 100).toFixed(0);
-                        this.folderTag.textContent = `${folder} (${confidence}%)`;
-                    });
+                // ✅ CORREÇÃO NA CAPTURA - SEM INVERSÃO
+                if (this.currentCamera === 'user') {
+                    ctx.scale(-1, 1);
+                    ctx.drawImage(this.video, -this.canvas.width, 0);
+                } else {
+                    ctx.drawImage(this.video, 0, 0);
+                }
+                
+                const photoData = this.canvas.toDataURL("image/jpeg", 0.9);
+                const photo = {
+                    id: Date.now(),
+                    data: photoData,
+                    date: new Date().toLocaleString('pt-BR')
                 };
-            }
-
-            getSmartFolder(label) {
-                const lowerLabel = label.toLowerCase();
-                if (lowerLabel.includes('food') || lowerLabel.includes('pizza') || lowerLabel.includes('cake')) {
-                    return this.folders.food;
-                }
-                if (lowerLabel.includes('person') || lowerLabel.includes('man') || lowerLabel.includes('woman')) {
-                    return this.folders.person;
-                }
-                if (lowerLabel.includes('car') || lowerLabel.includes('vehicle')) {
-                    return this.folders.car;
-                }
-                if (lowerLabel.includes('dog') || lowerLabel.includes('cat') || lowerLabel.includes('animal')) {
-                    return this.folders.animal;
-                }
-                if (lowerLabel.includes('mountain') || lowerLabel.includes('beach') || lowerLabel.includes('tree')) {
-                    return this.folders.landscape;
-                }
-                return this.folders.object;
-            }
-
-            saveToFolder() {
-                const folderName = this.folderTag.textContent.split(' ')[0];
-                const link = document.createElement("a");
-                link.href = this.currentPhotoData;
-                link.download = `${folderName}_${Date.now()}.jpg`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
                 
-                this.folderTag.style.background = 'rgba(0,200,83,0.3)';
-                setTimeout(() => {
-                    this.aiOverlay.classList.remove('show');
-                    this.folderTag.style.background = '';
-                }, 1200);
+                this.photos.unshift(photo);
+                localStorage.setItem('cameraPhotos', JSON.stringify(this.photos));
+                this.galleryThumb.src = photoData;
+                this.loadPhotos();
+            }
+
+            loadPhotos() {
+                this.galleryGrid.innerHTML = '';
+                this.photos.slice(0, 18).forEach(photo => {
+                    const div = document.createElement('div');
+                    div.className = 'gallery-photo';
+                    div.innerHTML = `<img src="${photo.data}" alt="${photo.date}">`;
+                    div.onclick = () => this.selectPhoto(photo);
+                    this.galleryGrid.appendChild(div);
+                });
+            }
+
+            selectPhoto(photo) {
+                this.selectedPhoto = photo;
+                this.folderSelector.style.display = 'flex';
+            }
+
+            savePhoto(photo, folder) {
+                photo.folder = folder;
+                localStorage.setItem('cameraPhotos', JSON.stringify(this.photos));
+                this.loadPhotos();
+                this.folderSelector.style.display = 'none';
+                
+                // Download
+                const link = document.createElement("a");
+                link.href = photo.data;
+                link.download = `${folder.replace(/[^a-z0-9]/gi, '_')}_${photo.id}.jpg`;
+                link.click();
             }
 
             handleFocus(e) {
@@ -655,7 +655,7 @@
             }
         }
 
-        window.addEventListener('load', () => new SamsungCameraPro());
+        window.addEventListener('load', () => new SamsungCamera());
     </script>
 </body>
 </html>
