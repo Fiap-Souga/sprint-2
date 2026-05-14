@@ -3,22 +3,18 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-    <title>iPhone Camera Pro + AI Organizer</title>
+    <title>Samsung Camera Pro</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
-    
-    <!-- ML5.js para classificação de imagens -->
     <script src="https://unpkg.com/ml5@0.4.3/dist/ml5.min.js"></script>
     
     <style>
         :root {
-            --primary-color: #ffd000;
-            --accent-color: #00ff88;
-            --bg-primary: #000;
-            --text-primary: #fff;
-            --border-color: rgba(255,255,255,0.12);
-            --blur-bg: rgba(0,0,0,0.4);
-            --success: #00ff88;
-            --folder-bg: rgba(0,255,136,0.15);
+            --primary-gold: #ffc107;
+            --accent-green: #00c853;
+            --bg-black: #000;
+            --text-white: #fff;
+            --glass-bg: rgba(255,255,255,0.08);
+            --glass-border: rgba(255,255,255,0.12);
         }
 
         * {
@@ -33,7 +29,7 @@
         body {
             width: 100%;
             height: 100vh;
-            background: var(--bg-primary);
+            background: var(--bg-black);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -64,7 +60,7 @@
             display: flex;
             justify-content: space-between;
             align-items: flex-end;
-            color: var(--text-primary);
+            color: var(--text-white);
             z-index: 999;
             font-size: 14px;
             font-weight: 500;
@@ -73,37 +69,65 @@
             padding-top: max(20px, env(safe-area-inset-top));
         }
 
-        .top-menu {
+        /* Interface limpa - inspirada Samsung */
+        .top-controls {
             position: absolute;
-            top: 70px;
-            left: 0;
-            right: 0;
+            top: 80px;
+            left: 20px;
+            right: 20px;
             display: flex;
-            justify-content: space-evenly;
-            padding: 12px 0;
-            color: var(--text-primary);
+            justify-content: space-between;
+            align-items: center;
             z-index: 999;
-            background: var(--blur-bg);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--border-color);
         }
 
-        .top-menu i, .top-menu button {
+        .camera-switch {
+            width: 44px;
+            height: 44px;
+            border-radius: 22px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-white);
+            font-size: 18px;
             cursor: pointer;
-            transition: all 0.25s ease;
-            padding: 8px;
-            border-radius: 12px;
-            opacity: 0.8;
-            font-size: 26px;
-            background: none;
-            border: none;
-            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
         }
 
-        .top-menu i:hover, .top-menu button:hover {
+        .camera-switch:hover {
+            background: rgba(255,255,255,0.15);
+            transform: scale(1.05);
+        }
+
+        .zoom-slider {
+            display: flex;
+            gap: 8px;
+            background: var(--glass-bg);
+            padding: 8px 12px;
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .zoom-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 18px;
+            border: none;
+            background: transparent;
+            color: var(--text-white);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            opacity: 0.7;
+        }
+
+        .zoom-btn.active {
+            background: var(--primary-gold);
+            color: #000;
             opacity: 1;
-            transform: scale(1.15);
-            background: rgba(255,255,255,0.1);
         }
 
         .camera-area {
@@ -117,64 +141,45 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            background: radial-gradient(circle at center, #1a1a1a 0%, #000 100%);
-            transform: scaleX(1);
+            background: #000;
         }
 
+        /* SEM INVERSÃO na câmera frontal */
         .camera-user video {
-            transform: scaleX(-1) !important;
+            transform: none !important;
         }
 
         .flash {
             position: absolute;
             inset: 0;
-            background: radial-gradient(circle, #fff 0%, #ffd000 30%, transparent 70%);
+            background: radial-gradient(circle, #fff 0%, #ffc107 30%, transparent 70%);
             opacity: 0;
             pointer-events: none;
             transition: all 0.2s ease-out;
         }
 
-        .grid {
-            position: absolute;
-            inset: 0;
-            pointer-events: none;
-            display: none;
-            opacity: 0.4;
-        }
-
-        .grid span {
-            position: absolute;
-            background: var(--accent-color);
-        }
-
-        .grid span:nth-child(1), .grid span:nth-child(2) { width: 1px; height: 100%; }
-        .grid span:nth-child(3), .grid span:nth-child(4) { height: 1px; width: 100%; }
-        .grid span:nth-child(1) { left: 33.33%; }
-        .grid span:nth-child(2) { left: 66.66%; }
-        .grid span:nth-child(3) { top: 33.33%; }
-        .grid span:nth-child(4) { top: 66.66%; }
-
-        .focus {
-            width: 100px;
-            height: 100px;
-            border: 2px solid var(--primary-color);
-            border-radius: 20px;
+        .focus-ring {
+            width: 120px;
+            height: 120px;
+            border: 2px solid var(--primary-gold);
+            border-radius: 50%;
             position: absolute;
             display: none;
             pointer-events: none;
-            animation: focusPulse 0.8s ease;
+            animation: focusPulse 0.6s ease-out;
+            box-shadow: 0 0 20px rgba(255,193,7,0.5);
         }
 
         @keyframes focusPulse {
-            0% { transform: scale(1.8); opacity: 0; }
-            100% { transform: scale(1); opacity: 0; }
+            0% { transform: scale(0); opacity: 1; }
+            100% { transform: scale(1.2); opacity: 0; }
         }
 
-        /* NOVO: SISTEMA DE PASTAS AI */
+        /* AI Overlay mais limpo */
         .ai-overlay {
             position: absolute;
             inset: 0;
-            background: rgba(0,0,0,0.9);
+            background: rgba(0,0,0,0.95);
             display: none;
             flex-direction: column;
             justify-content: center;
@@ -182,7 +187,8 @@
             z-index: 1000;
             color: white;
             text-align: center;
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(20px);
+            gap: 24px;
         }
 
         .ai-overlay.show {
@@ -190,176 +196,175 @@
         }
 
         .ai-spinner {
-            width: 60px;
-            height: 60px;
-            border: 4px solid rgba(255,255,255,0.2);
-            border-top: 4px solid var(--primary-color);
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255,255,255,0.2);
+            border-top: 3px solid var(--primary-gold);
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin-bottom: 20px;
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            to { transform: rotate(360deg); }
         }
 
-        .ai-result {
+        .folder-suggestion {
+            background: rgba(0,200,83,0.15);
+            padding: 16px 32px;
+            border-radius: 28px;
+            border: 2px solid var(--accent-green);
             font-size: 18px;
-            margin-bottom: 20px;
-            opacity: 0;
-            animation: fadeIn 0.5s forwards;
-        }
-
-        @keyframes fadeIn {
-            to { opacity: 1; }
-        }
-
-        .folder-tag {
-            background: var(--folder-bg);
-            padding: 12px 24px;
-            border-radius: 25px;
-            border: 2px solid var(--success);
             font-weight: 600;
-            font-size: 20px;
-            margin: 10px 0;
-            backdrop-filter: blur(10px);
         }
 
         .ai-buttons {
             display: flex;
-            gap: 16px;
-            margin-top: 30px;
+            gap: 12px;
         }
 
         .ai-btn {
-            padding: 14px 28px;
+            padding: 12px 24px;
             border: none;
             border-radius: 25px;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
+            min-width: 120px;
         }
 
         .confirm-btn {
-            background: var(--success);
+            background: var(--accent-green);
             color: white;
         }
 
         .change-btn {
-            background: rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.1);
             color: white;
             border: 1px solid rgba(255,255,255,0.3);
         }
 
-        .zoom, .bottom {
-            /* mesmos estilos anteriores */
+        /* Bottom controls limpos - Samsung style */
+        .bottom-controls {
             position: absolute;
-            z-index: 999;
-        }
-
-        .zoom {
-            bottom: 260px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 12px;
-            padding: 12px;
-            background: rgba(0,0,0,0.7);
-            backdrop-filter: blur(25px);
-            border-radius: 28px;
-            border: 1px solid var(--border-color);
-        }
-
-        .zoom button {
-            width: 56px;
-            height: 56px;
-            border-radius: 16px;
-            border: none;
-            background: rgba(0,0,0,0.6);
-            color: white;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.25s ease;
-        }
-
-        .zoom button.active {
-            background: white;
-            color: black;
-        }
-
-        .bottom {
             bottom: 0;
             left: 0;
             right: 0;
-            padding: 32px 24px 24px;
-            background: linear-gradient(to top, rgba(0,0,0,0.98) 0%, transparent 100%);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            z-index: 999;
         }
 
-        .modes {
+        .mode-selector {
             display: flex;
             justify-content: center;
-            gap: 28px;
-            margin-bottom: 24px;
+            gap: 24px;
         }
 
-        .modes button {
+        .mode-btn {
             background: none;
             border: none;
             color: rgba(255,255,255,0.6);
-            font-size: 17px;
-            font-weight: 600;
-            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
             padding: 8px 16px;
             border-radius: 20px;
+            cursor: pointer;
             transition: all 0.3s ease;
         }
 
-        .modes button.active {
-            color: white;
-            background: rgba(255,255,255,0.15);
+        .mode-btn.active {
+            color: var(--text-white);
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
         }
 
-        .controls {
+        .capture-row {
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            justify-content: space-between;
         }
 
-        .gallery {
-            width: 68px;
-            height: 68px;
-            border-radius: 20px;
+        .gallery-btn {
+            width: 64px;
+            height: 64px;
+            border-radius: 18px;
             overflow: hidden;
             border: 2px solid rgba(255,255,255,0.3);
             cursor: pointer;
+            transition: all 0.2s ease;
+            background: var(--glass-bg);
         }
 
-        .capture {
-            width: 82px;
-            height: 82px;
+        .gallery-btn:hover {
+            border-color: var(--primary-gold);
+            transform: scale(1.05);
+        }
+
+        .gallery-btn img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .capture-btn {
+            width: 80px;
+            height: 80px;
             border-radius: 50%;
-            border: 7px solid rgba(255,255,255,0.85);
+            border: 6px solid rgba(255,255,255,0.8);
             background: white;
             cursor: pointer;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+            transition: all 0.2s ease;
         }
 
-        .side-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
+        .capture-btn:active {
+            transform: scale(0.95);
         }
 
-        .side-buttons button {
-            width: 60px;
-            height: 60px;
-            border-radius: 18px;
-            background: rgba(0,0,0,0.5);
-            border: none;
-            color: white;
+        .grid-toggle {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-white);
+            font-size: 16px;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .grid-toggle:hover {
+            background: rgba(255,255,255,0.15);
+        }
+
+        .grid-overlay {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            display: none;
+            opacity: 0.4;
+        }
+
+        .grid-line {
+            position: absolute;
+            background: var(--accent-green);
+        }
+
+        .grid-line.v { width: 1px; height: 100%; }
+        .grid-line.h { height: 1px; width: 100%; }
+        .grid-line:nth-child(1) { left: 33%; }
+        .grid-line:nth-child(2) { left: 67%; }
+        .grid-line:nth-child(3) { top: 33%; }
+        .grid-line:nth-child(4) { top: 67%; }
+
+        canvas, #aiImage {
+            display: none;
         }
 
         @media (max-width: 430px) {
@@ -372,7 +377,7 @@
     <div class="phone">
         <!-- Status bar -->
         <div class="status-bar">
-            <div><span id="clock">09:15</span></div>
+            <div><span id="clock">09:32</span></div>
             <div>
                 <i class="fa-solid fa-signal-bars-good"></i>
                 <i class="fa-solid fa-wifi"></i>
@@ -380,65 +385,65 @@
             </div>
         </div>
 
-        <!-- Top menu -->
-        <div class="top-menu">
-            <i class="fa-solid fa-bolt"></i>
-            <i class="fa-solid fa-wand-magic-sparkles"></i>
-            <i title="AI Organizer"><i class="fa-solid fa-folder-open"></i></i>
-            <i class="fa-solid fa-moon"></i>
-            <i class="fa-solid fa-gear"></i>
+        <!-- Top controls (limpos) -->
+        <div class="top-controls">
+            <div class="camera-switch" id="switchCamera" title="Trocar câmera">
+                <i class="fa-solid fa-rotate"></i>
+            </div>
+            <div class="zoom-slider">
+                <button class="zoom-btn" data-zoom="0.5">0.5x</button>
+                <button class="zoom-btn active" data-zoom="1">1x</button>
+                <button class="zoom-btn" data-zoom="2">2x</button>
+            </div>
         </div>
 
-        <!-- Camera -->
+        <!-- Camera area -->
         <div class="camera-area">
             <video id="video" autoplay playsinline muted></video>
             <div class="flash" id="flash"></div>
-            <div class="grid" id="grid"><span></span><span></span><span></span><span></span></div>
-            <div class="focus" id="focus"></div>
-            
-            <!-- AI OVERLAY -->
+            <div class="grid-overlay" id="grid">
+                <div class="grid-line"></div>
+                <div class="grid-line"></div>
+                <div class="grid-line"></div>
+                <div class="grid-line"></div>
+            </div>
+            <div class="focus-ring" id="focus"></div>
+
+            <!-- AI Overlay -->
             <div class="ai-overlay" id="aiOverlay">
                 <div class="ai-spinner"></div>
-                <div class="ai-result" id="aiResult">Analisando com IA...</div>
-                <div class="folder-tag" id="folderTag"></div>
+                <div class="folder-suggestion" id="folderTag">Analisando...</div>
                 <div class="ai-buttons">
-                    <button class="ai-btn confirm-btn" id="confirmFolder">Salvar aqui ✓</button>
-                    <button class="ai-btn change-btn" id="changeFolder">Mudar pasta</button>
+                    <button class="ai-btn confirm-btn" id="confirmFolder">Salvar ✓</button>
+                    <button class="ai-btn change-btn" id="changeFolder">Cancelar</button>
                 </div>
             </div>
         </div>
 
-        <!-- Zoom & Bottom (mesmo código anterior) -->
-        <div class="zoom">
-            <button data-zoom="0.5">0.5x</button>
-            <button class="active" data-zoom="1">1x</button>
-            <button data-zoom="2">2x</button>
-        </div>
-
-        <div class="bottom">
-            <div class="modes">
-                <button>Retrato</button>
-                <button class="active">Foto</button>
-                <button>Vídeo</button>
+        <!-- Bottom controls -->
+        <div class="bottom-controls">
+            <div class="mode-selector">
+                <button class="mode-btn">Retrato</button>
+                <button class="mode-btn active">Foto</button>
+                <button class="mode-btn">Vídeo</button>
             </div>
-            <div class="controls">
-                <div class="gallery" id="gallery">
+            <div class="capture-row">
+                <div class="gallery-btn" id="gallery">
                     <img id="galleryImg" src="https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=400" alt="">
                 </div>
-                <button class="capture" id="capture"></button>
-                <div class="side-buttons">
-                    <button id="switchCamera"><i class="fa-solid fa-rotate"></i></button>
-                    <button id="toggleGrid"><i class="fa-solid fa-border-all"></i></button>
+                <button class="capture-btn" id="capture"></button>
+                <div class="grid-toggle" id="toggleGrid" title="Grade">
+                    <i class="fa-solid fa-border-all"></i>
                 </div>
             </div>
         </div>
 
-        <canvas id="canvas" style="display: none;"></canvas>
-        <img id="aiImage" style="display: none;">
+        <canvas id="canvas"></canvas>
+        <img id="aiImage">
     </div>
 
     <script>
-        class AICameraOrganizer {
+        class SamsungCameraPro {
             constructor() {
                 this.video = document.getElementById("video");
                 this.capture = document.getElementById("capture");
@@ -449,15 +454,17 @@
                 this.clock = document.getElementById("clock");
                 this.galleryImg = document.getElementById("galleryImg");
                 this.aiOverlay = document.getElementById("aiOverlay");
-                this.aiResult = document.getElementById("aiResult");
                 this.folderTag = document.getElementById("folderTag");
                 this.confirmFolder = document.getElementById("confirmFolder");
                 this.changeFolder = document.getElementById("changeFolder");
 
-                this.currentCamera = "environment";
+                this.currentCamera = "environment"; // Começa com câmera traseira
                 this.currentStream = null;
                 this.classifier = null;
                 this.currentPhotoData = null;
+                this.zoomLevel = 1;
+                this.isGridVisible = false;
+
                 this.folders = {
                     'food': '🍔 Comida',
                     'person': '👤 Pessoas', 
@@ -475,9 +482,9 @@
                 this.updateClock();
                 setInterval(() => this.updateClock(), 1000);
                 
-                // Carregar modelo ML5.js MobileNet
+                // ML5.js
                 this.classifier = await ml5.imageClassifier('MobileNet', () => {
-                    console.log('🤖 AI Organizer carregado!');
+                    console.log('🤖 AI carregada!');
                 });
                 
                 this.bindEvents();
@@ -489,35 +496,75 @@
                     if (this.currentStream) {
                         this.currentStream.getTracks().forEach(track => track.stop());
                     }
-                    const stream = await navigator.mediaDevices.getUserMedia({
-                        video: { facingMode: this.currentCamera }
-                    });
+
+                    const constraints = {
+                        video: { 
+                            facingMode: this.currentCamera,
+                            width: { ideal: 1920 },
+                            height: { ideal: 1080 }
+                        }
+                    };
+
+                    const stream = await navigator.mediaDevices.getUserMedia(constraints);
                     this.currentStream = stream;
                     this.video.srcObject = stream;
+                    
+                    // ✅ SEM INVERSÃO na câmera frontal
                     this.video.classList.toggle('camera-user', this.currentCamera === 'user');
+                    
                     await this.video.play();
+                    this.applyZoom();
                 } catch (e) {
+                    console.error('Erro câmera:', e);
                     alert('Permita acesso à câmera!');
                 }
             }
 
             bindEvents() {
+                // Switch câmera
                 document.getElementById("switchCamera").onclick = () => {
                     this.currentCamera = this.currentCamera === "user" ? "environment" : "user";
                     this.startCamera();
                 };
 
-                this.capture.onclick = () => this.capturePhoto();
-
-                this.video.onclick = (e) => this.handleFocus(e);
-
-                document.getElementById("toggleGrid").onclick = () => {
-                    const grid = document.getElementById("grid");
-                    grid.style.display = grid.style.display === 'block' ? 'none' : 'block';
+                // ✅ Galeria mais confiável
+                document.getElementById("gallery").onclick = (e) => {
+                    e.stopPropagation();
+                    if (this.currentPhotoData) {
+                        window.open(this.currentPhotoData, '_blank');
+                    }
                 };
 
+                // Capture
+                this.capture.onclick = () => this.capturePhoto();
+
+                // Focus
+                this.video.onclick = (e) => this.handleFocus(e);
+
+                // Grid toggle
+                document.getElementById("toggleGrid").onclick = () => {
+                    this.isGridVisible = !this.isGridVisible;
+                    document.getElementById("grid").style.display = this.isGridVisible ? 'block' : 'none';
+                };
+
+                // Zoom
+                document.querySelectorAll('.zoom-btn').forEach(btn => {
+                    btn.onclick = () => {
+                        this.zoomLevel = parseFloat(btn.dataset.zoom);
+                        document.querySelectorAll('.zoom-btn').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        this.applyZoom();
+                    };
+                });
+
+                // AI buttons
                 this.confirmFolder.onclick = () => this.saveToFolder();
                 this.changeFolder.onclick = () => this.aiOverlay.classList.remove('show');
+            }
+
+            applyZoom() {
+                const transform = `scale(${this.zoomLevel})`;
+                this.video.style.transform = transform;
             }
 
             updateClock() {
@@ -526,75 +573,55 @@
             }
 
             async capturePhoto() {
-                this.flash.style.opacity = "0.85";
-                setTimeout(() => this.flash.style.opacity = "0", 150);
+                this.flash.style.opacity = "0.9";
+                setTimeout(() => this.flash.style.opacity = "0", 200);
 
-                // Capturar imagem
+                // Captura SEM inversão na frontal
                 this.canvas.width = this.video.videoWidth;
                 this.canvas.height = this.video.videoHeight;
                 const ctx = this.canvas.getContext("2d");
+                ctx.drawImage(this.video, 0, 0); // SEM scale(-1,1)
                 
-                ctx.save();
-                if (this.currentCamera === 'user') {
-                    ctx.scale(-1, 1);
-                    ctx.drawImage(this.video, -this.canvas.width, 0);
-                } else {
-                    ctx.drawImage(this.video, 0, 0);
-                }
-                ctx.restore();
-                
-                this.currentPhotoData = this.canvas.toDataURL("image/jpeg", 0.9);
+                this.currentPhotoData = this.canvas.toDataURL("image/jpeg", 0.92);
                 this.galleryImg.src = this.currentPhotoData;
-
-                // Iniciar análise AI
                 this.analyzeWithAI();
             }
 
             analyzeWithAI() {
-                // Mostrar overlay
                 this.aiOverlay.classList.add('show');
-                this.aiResult.textContent = '🤖 IA analisando...';
+                this.folderTag.textContent = '🤖 Analisando...';
 
-                // Colocar imagem na AI
                 this.aiImage.src = this.currentPhotoData;
                 this.aiImage.onload = () => {
                     this.classifier.classify(this.aiImage, (error, results) => {
                         if (error) {
-                            console.error(error);
-                            this.aiResult.textContent = 'Erro na análise';
+                            this.folderTag.textContent = 'Erro na análise';
                             return;
                         }
                         
                         const topResult = results[0];
-                        const confidence = (topResult.confidence * 100).toFixed(1);
-                        
-                        // Mapear para pastas inteligentes
-                        let folder = this.getSmartFolder(topResult.label);
+                        const folder = this.getSmartFolder(topResult.label);
+                        const confidence = (topResult.confidence * 100).toFixed(0);
                         this.folderTag.textContent = `${folder} (${confidence}%)`;
-                        this.aiResult.textContent = `Detectado: ${topResult.label}`;
                     });
                 };
             }
 
             getSmartFolder(label) {
                 const lowerLabel = label.toLowerCase();
-                
-                if (lowerLabel.includes('food') || lowerLabel.includes('pizza') || lowerLabel.includes('cake') || 
-                    lowerLabel.includes('burger') || lowerLabel.includes('pasta') || lowerLabel.includes('bread')) {
+                if (lowerLabel.includes('food') || lowerLabel.includes('pizza') || lowerLabel.includes('cake')) {
                     return this.folders.food;
                 }
-                if (lowerLabel.includes('person') || lowerLabel.includes('man') || lowerLabel.includes('woman') || 
-                    lowerLabel.includes('child') || lowerLabel.includes('baby')) {
+                if (lowerLabel.includes('person') || lowerLabel.includes('man') || lowerLabel.includes('woman')) {
                     return this.folders.person;
                 }
-                if (lowerLabel.includes('car') || lowerLabel.includes('truck') || lowerLabel.includes('vehicle')) {
+                if (lowerLabel.includes('car') || lowerLabel.includes('vehicle')) {
                     return this.folders.car;
                 }
                 if (lowerLabel.includes('dog') || lowerLabel.includes('cat') || lowerLabel.includes('animal')) {
                     return this.folders.animal;
                 }
-                if (lowerLabel.includes('mountain') || lowerLabel.includes('beach') || lowerLabel.includes('tree') || 
-                    lowerLabel.includes('sky') || lowerLabel.includes('sea')) {
+                if (lowerLabel.includes('mountain') || lowerLabel.includes('beach') || lowerLabel.includes('tree')) {
                     return this.folders.landscape;
                 }
                 return this.folders.object;
@@ -602,8 +629,6 @@
 
             saveToFolder() {
                 const folderName = this.folderTag.textContent.split(' ')[0];
-                
-                // Criar link com nome da pasta
                 const link = document.createElement("a");
                 link.href = this.currentPhotoData;
                 link.download = `${folderName}_${Date.now()}.jpg`;
@@ -611,28 +636,26 @@
                 link.click();
                 document.body.removeChild(link);
                 
-                // Feedback
-                this.folderTag.style.background = 'rgba(0,255,136,0.3)';
+                this.folderTag.style.background = 'rgba(0,200,83,0.3)';
                 setTimeout(() => {
                     this.aiOverlay.classList.remove('show');
-                    this.folderTag.style.background = 'var(--folder-bg)';
-                }, 1500);
+                    this.folderTag.style.background = '';
+                }, 1200);
             }
 
             handleFocus(e) {
                 const rect = this.video.getBoundingClientRect();
-                const x = (e.clientX - rect.left) / rect.width * 100;
-                const y = (e.clientY - rect.top) / rect.height * 100;
+                const x = e.clientX - rect.left - 60;
+                const y = e.clientY - rect.top - 60;
                 
-                this.focus.style.left = `calc(${x}% - 50px)`;
-                this.focus.style.top = `calc(${y}% - 50px)`;
+                this.focus.style.left = x + 'px';
+                this.focus.style.top = y + 'px';
                 this.focus.style.display = "block";
-                setTimeout(() => this.focus.style.display = "none", 800);
+                setTimeout(() => this.focus.style.display = "none", 600);
             }
         }
 
-        // Inicializar
-        window.addEventListener('load', () => new AICameraOrganizer());
+        window.addEventListener('load', () => new SamsungCameraPro());
     </script>
 </body>
 </html>
